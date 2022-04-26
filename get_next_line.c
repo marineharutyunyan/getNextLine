@@ -202,7 +202,7 @@ char *get_next_line(int fd)
 		int endOfline = 0;
 		while (!endOfline)
 		{
-			if ((line && ft_strchr(line, '\n')) || line && !newbuff){
+			if (ft_strchr(line, '\n')) {
 				endOfline = 1;
 				int i = 0;
 				while (line[i])
@@ -213,10 +213,7 @@ char *get_next_line(int fd)
 				}
 				int indexOfEnter = i;
 				char *returnLine = ft_substr(line, 0, indexOfEnter);
-				if (!newbuff)
-					line = NULL;
-				else 
-					line = line + indexOfEnter + 1;
+				line = line + indexOfEnter + 1;
 				return returnLine;
 			} 
 			else 
@@ -225,7 +222,13 @@ char *get_next_line(int fd)
 				if (buff)
 					line = ft_strjoin(line, buff);
 				else 
-					line = ft_strjoin(line, "\n");
+				{
+					//when it's the end of the file
+					char *lineCopy = line;
+					line = NULL;
+					return (lineCopy);
+				}
+				
 			}
 		}
 		return (line);
