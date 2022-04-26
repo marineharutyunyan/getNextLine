@@ -1,12 +1,5 @@
+#include "get_next_line.h"
 
-#include<stdio.h>
-#include <fcntl.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#ifndef BUFFER_SIZE
-#define BUFFER_SIZE 42 
-#endif
 size_t 		ft_strlen(const char *s)
 {
 	int		i;
