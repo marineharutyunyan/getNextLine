@@ -211,9 +211,9 @@ char *get_next_line(int fd)
 						break;
 					i++;
 				}
-				int indexOfEnter = i;
+				int indexOfEnter = i+ 1;
 				char *returnLine = ft_substr(line, 0, indexOfEnter);
-				line = line + indexOfEnter + 1;
+				line = line + indexOfEnter;
 				return returnLine;
 			} 
 			else 
@@ -239,14 +239,12 @@ char *get_next_line(int fd)
 int main ()
 {
     int fd = open("./a.txt", O_RDONLY);
-	printf("%s",get_next_line(fd));
-	printf("---\n");
-	printf("%s",get_next_line(fd));
-	printf("---\n");
-	printf("%s",get_next_line(fd));
-	printf("---\n");
-	printf("%s",get_next_line(fd));
-	printf("---\n");
+	printf("%s",get_next_line(fd));printf("-");
+	printf("%s",get_next_line(fd));printf("-");
+	printf("%s",get_next_line(fd));printf("-");
+	printf("%s",get_next_line(fd));printf("-");
+//	printf("%s",get_next_line(fd));
+	//printf("-");
 	close(fd);
 
     return (0);
