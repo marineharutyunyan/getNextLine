@@ -62,11 +62,6 @@ char	*get_line(char *buff)
 	return (NULL);
 }
 
-char *save_next_line(char *buff)
-{
-	return (buff + get_index_of_char(buff, '\n'));
-}
-
 char	*get_next_line(int fd)
 {
 	static char	*buffer;
@@ -84,7 +79,7 @@ char	*get_next_line(int fd)
 		buffer = NULL;
 		return (result);
 	}
-	buffer = save_next_line(buffer);
+	buffer = buffer + get_index_of_char(buff, '\n');
 	return (line);
 }
 
