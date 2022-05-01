@@ -1,4 +1,29 @@
-#include "get_next_line.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: maharuty <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/04/26 20:34:00 by maharuty          #+#    #+#             */
+/*   Updated: 2022/04/28 12:59:23 by maharuty         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#ifndef BUFFER_SIZE
+#define BUFFER_SIZE 42
+#endif
+
+#include<stdio.h>
+#include <fcntl.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
+char	*ft_strjoin(char *s1, char *s2);
+char	*ft_substr(char const *s, unsigned int start, size_t len);
+char	*get_next_line(int fd);
+char	*ft_strchr(const char *s, int c);
 
 size_t 		ft_strlen(const char *s)
 {
@@ -38,39 +63,6 @@ char	*ft_strchr(const char *s, int c)
 	return (0);
 }
 
-
-int			ft_getstart(const char *s1, const char *set)
-{
-	size_t	len;
-	size_t	i;
-
-	len = ft_strlen(s1);
-	i = 0;
-	while (i < len)
-	{
-		if (ft_strchr(set, s1[i]) == 0)
-			break ;
-		i++;
-	}
-	return (i);
-}
-
-int			ft_getend(const char *s1, const char *set)
-{
-	size_t	len;
-	size_t	i;
-
-	len = ft_strlen(s1);
-	i = 0;
-	while (i < len)
-	{
-		if (ft_strchr(set, s1[len - i - 1]) == 0)
-			break ;
-		i++;
-	}
-	return (len - i);
-}
-
 size_t	ft_strlcpy(char *dst, const char *src, size_t dstsize)
 {
 	size_t i;
@@ -94,39 +86,6 @@ size_t	ft_strlcpy(char *dst, const char *src, size_t dstsize)
 	return (src_len);
 }
 
-char		*ft_strtrim(char const *s1, char const *set)
-{
-	int		start;
-	int		end;
-	char	*newstr;
-
-	if (s1 == NULL)
-		return (NULL);
-	if (set == NULL)
-		return (ft_strdup(s1));
-	start = ft_getstart(s1, set);
-	end = ft_getend(s1, set);
-	if (start >= end)
-		return (ft_strdup(""));
-	newstr = (char *)malloc(sizeof(char) * (end - start + 1));
-	if (newstr == NULL)
-		return (NULL);
-	ft_strlcpy(newstr, s1 + start, end - start + 1);
-	return (newstr);
-}
-void	*ft_memcpy(void *dst, const void *src, size_t n)
-{
-	char		*dstc;
-	const char	*srcc;
-
-	if (!dst && !src)
-		return (0);
-	dstc = (char *)dst;
-	srcc = (const char *)src;
-	while (n--)
-		dstc[n] = srcc[n];
-	return (dst);
-}
 
 char		*ft_substr(char const *s, unsigned int start, size_t len)
 {
@@ -161,72 +120,85 @@ char		*ft_strjoin(char *s1, char *s2)
 		return (NULL);
 	strncpy(newstr, s1, s1_len + 1);
 	strncat(newstr + (s1_len), s2, s2_len + 1);
+	//free(s1);
+	//free(s2);
 	return (newstr);
 }
 
 
-
-
-
-
-const int size = 50;
-char *readbuff(int fd)
+char	*read_file(int fd, char *old_buff)
 {
-	char *buff = malloc((size * sizeof(char)) + 1);
-	int x = read(fd, buff, size);
-	if(x <= 0)
-		return (NULL);
+	char	*buff;
+	char	*line;
+	int		x;
+
+	buff = malloc((BUFFER_SIZE * sizeof(char)) + 1);
+	x = read(fd, buff, BUFFER_SIZE);
+	if (x <= 0 )
+	{
+	 	if (old_buff)
+			return (old_buff);
+		else 
+			return (NULL);	
+	}
 	buff[x] = 0;
-	char *line = malloc((x * sizeof(char)) + 1);
+	line = malloc((x * sizeof(char)) + 1);
 	line = buff;
-	return line;
+	if (old_buff)
+		line = ft_strjoin(line, old_buff);
+	
+	return (line);
 }
 
-char *get_next_line(int fd)
+int	get_index_of_char(char *line, char ch)
 {
-    static char *line;
-	char ch = '\n';
+	int	i;
 
-	char *newbuff = readbuff(fd);
-	line = ft_strjoin(line, newbuff);
-	
-	if (line)
-	{	
-		int endOfline = 0;
-		while (!endOfline)
-		{
-			if (ft_strchr(line, '\n')) {
-				endOfline = 1;
-				int i = 0;
-				while (line[i])
-				{
-					if (line[i] == '\n')
-						break;
-					i++;
-				}
-				int indexOfEnter = i+ 1;
-				char *returnLine = ft_substr(line, 0, indexOfEnter);
-				line = line + indexOfEnter;
-				return returnLine;
-			} 
-			else 
-			{
-				char *buff = readbuff(fd);
-				if (buff)
-					line = ft_strjoin(line, buff);
-				else 
-				{
-					//when it's the end of the file
-					char *lineCopy = line;
-					line = NULL;
-					return (lineCopy);
-				}
-				
-			}
-		}
-		return (line);
+	i = 0;
+	while (line[i])
+	{
+		if (line[i] == ch)
+			break ;
+		i++;
+	}
+	return (i + 1);
+}
+
+char	*get_line(char *buff)
+{
+	char *return_line;
+
+	if (ft_strchr(buff, '\n'))
+	{
+		return_line = ft_substr(buff, 0, get_index_of_char(buff, '\n'));
+		return (return_line);
 	}
 	return (NULL);	
+}
+
+char *save_next_line(char *buff)
+{
+	return (buff + get_index_of_char(buff, '\n'));
+}
+
+char	*get_next_line(int fd)
+{
+	static char	*buffer;
+	char		*line;
+
+	if (fd < 0 || BUFFER_SIZE <= 0)
+		return (NULL);
+	buffer = read_file(fd, buffer);
+	if (!buffer)
+		return (NULL);
+	line = get_line(buffer);
+	while (!line && buffer)
+	{
+		buffer = read_file(fd, buffer);
+		line = get_line(buffer);
+	}
+	buffer = save_next_line(buffer);
+	return (line);
 }
 
 int main ()
