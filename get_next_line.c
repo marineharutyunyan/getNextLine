@@ -12,27 +12,27 @@
 
 #include "get_next_line.h"
 
-char	*read_file(int fd, char *old_buff)
+char	*read_line(int fd, char *old_buff)
 {
 	char	*buff;
-	char	*new_buff;
 	int		x;
 
-	buff = old_buff;
-	while (!ft_strchr(buff, '\n') || !ft_strchr(buff, '\0'))
+	if(old_buff && ft_strchr(old_buff, '\n'))
+		return old_buff;
+	buff = malloc((BUFFER_SIZE * sizeof(char)) + 1);
+	x = read(fd, buff, BUFFER_SIZE);
+	if (x <= 0 )
 	{
-		new_buff = malloc((BUFFER_SIZE * sizeof(char)) + 1);
-		x = read(fd, new_buff, BUFFER_SIZE);
-		if (x <= 0 )
-		{
-			if (old_buff)
-				return (old_buff);
-			else 
-				return (NULL);	
-		}
-		new_buff[x] = 0;
-		buff = ft_strjoin(buff, new_buff);
+	 	if (old_buff && old_buff[0])
+			return (old_buff);
+		else
+			return (NULL);
 	}
+	buff[x] = 0;
+	if (old_buff)
+		buff = ft_strjoin(buff, old_buff);
+	if (buff && !ft_strchr(buff, '\n'))
+		read_line(fd, buff);
 	return (buff);
 }
 
@@ -52,14 +52,17 @@ int	get_index_of_char(char *line, char ch)
 
 char	*get_line(char *buff)
 {
+	char *return_line;
+
 	if (ft_strchr(buff, '\n'))
-		return (ft_substr(buff, 0, get_index_of_char(buff, '\n')));
-	else if (ft_strchr(buff, '\0'))
-		return (ft_substr(buff, 0, get_index_of_char(buff, '\0')));
-	return (NULL);	
+	{
+		return_line = ft_substr(buff, 0, get_index_of_char(buff, '\n'));
+		return (return_line);
+	}
+	return (NULL);
 }
 
-char *get_buffer(char *buff)
+char *save_next_line(char *buff)
 {
 	return (buff + get_index_of_char(buff, '\n'));
 }
@@ -67,15 +70,34 @@ char *get_buffer(char *buff)
 char	*get_next_line(int fd)
 {
 	static char	*buffer;
-	char		*result;
 	char		*line;
 
 	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
-	line = read_file(fd, buffer);
-	if (!line)
+	buffer = read_line(fd, buffer);
+	if (!buffer)
 		return (NULL);
-	result = get_line(line);
-	buffer = get_buffer(line);
-	return (result);
+	line = get_line(buffer);
+	if(!line && buffer)
+	{//file ends without enter in the last line
+		char *result = buffer;
+		buffer = NULL;
+		return (result);
+	}
+	buffer = save_next_line(buffer);
+	return (line);
+}
+
+int main ()
+{
+    int fd = open("./a.txt", O_RDONLY);
+	printf("%s",get_next_line(fd));printf("-");
+	printf("%s",get_next_line(fd));printf("-");
+	printf("%s",get_next_line(fd));printf("-");
+	printf("%s",get_next_line(fd));printf("-");
+	printf("%s",get_next_line(fd));printf("-");
+	printf("%s",get_next_line(fd));printf("-");
+	close(fd);
+
+    return (0);
 }
