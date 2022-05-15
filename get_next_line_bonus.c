@@ -6,11 +6,11 @@
 /*   By: maharuty <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/26 20:34:00 by maharuty          #+#    #+#             */
-/*   Updated: 2022/05/06 01:34:40 by maharuty         ###   ########.fr       */
+/*   Updated: 2022/05/06 01:48:57 by maharuty         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 
 char	*read_line(int fd, char *old_buff)
 {
@@ -88,27 +88,13 @@ char	*after(char *buffer)
 
 char	*get_next_line(int fd)
 {
-	static char	*buffer;
+	static char	*buffer[MAX_SIZE];
 	char		*line;
 
 	if (fd < 0 || BUFFER_SIZE <= 0 || read(fd, 0, 0) < 0)
 		return (NULL);
-	buffer = read_line(fd, buffer);
-	line = before(buffer);
-	buffer = after(buffer);
+	buffer[fd] = read_line(fd, buffer[fd]);
+	line = before(buffer[fd]);
+	buffer[fd] = after(buffer[fd]);
 	return (line);
-}
-
-int main ()
-{
-    int fd = open("./a.txt", O_RDONLY);
-	printf("%s",get_next_line(fd));printf("-");
-	printf("%s",get_next_line(fd));printf("-");
-	printf("%s",get_next_line(fd));printf("-");
-	printf("%s",get_next_line(fd));printf("-");
-	printf("%s",get_next_line(fd));printf("-");
-	printf("%s",get_next_line(fd));printf("-");
-	close(fd);
-
-    return (0);
 }

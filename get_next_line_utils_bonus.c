@@ -6,11 +6,11 @@
 /*   By: maharuty <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/02 21:29:31 by maharuty          #+#    #+#             */
-/*   Updated: 2022/05/06 01:52:57 by maharuty         ###   ########.fr       */
+/*   Updated: 2022/05/06 01:53:19 by maharuty         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 #include <string.h>
 
 size_t	ft_strlen(const char *s)
